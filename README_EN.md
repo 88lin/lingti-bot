@@ -274,6 +274,10 @@ lingti-bot router --provider deepseek --api-key sk-xxx --webapp-port 8080
 # Open http://localhost:8080
 ```
 
+<p align="center">
+<img src="docs/images/webapp-demo.png" alt="Web Chat UI Demo" width="800" />
+</p>
+
 **Key features:**
 
 | Feature | Details |

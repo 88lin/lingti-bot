@@ -610,6 +610,10 @@ lingti-bot router --provider deepseek --api-key sk-xxx --webapp-port 8080
 # 打开浏览器访问 http://localhost:8080
 ```
 
+<p align="center">
+<img src="docs/images/webapp-demo.png" alt="Web 聊天界面演示" width="800" />
+</p>
+
 **核心特性：**
 
 | 特性 | 说明 |
