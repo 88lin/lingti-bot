@@ -30,6 +30,7 @@ import (
 	"github.com/pltanton/lingti-bot/internal/platforms/twitch"
 	"github.com/pltanton/lingti-bot/internal/platforms/matrix"
 	"github.com/pltanton/lingti-bot/internal/platforms/teams"
+	"github.com/pltanton/lingti-bot/internal/platforms/webapp"
 	"github.com/pltanton/lingti-bot/internal/platforms/whatsapp"
 	"github.com/pltanton/lingti-bot/internal/router"
 	"github.com/pltanton/lingti-bot/internal/voice"
@@ -91,6 +92,7 @@ var (
 	voiceSTTProvider     string
 	voiceSTTAPIKey       string
 	browserDebugDir      string
+	webappPort           int
 )
 
 var routerCmd = &cobra.Command{
@@ -176,6 +178,7 @@ func init() {
 	routerCmd.Flags().StringVar(&voiceSTTProvider, "voice-stt-provider", "", "Voice STT provider: system, openai (or VOICE_STT_PROVIDER env)")
 	routerCmd.Flags().StringVar(&voiceSTTAPIKey, "voice-stt-api-key", "", "Voice STT API key (or VOICE_STT_API_KEY env)")
 	routerCmd.Flags().StringVar(&browserDebugDir, "debug-dir", "", "Directory for debug screenshots (or BROWSER_DEBUG_DIR env, default: /tmp/lingti-bot on Unix)")
+	routerCmd.Flags().IntVar(&webappPort, "webapp-port", 0, "Web chat UI port (0 = disabled, or WEBAPP_PORT env)")
 }
 
 func runRouter(cmd *cobra.Command, args []string) {
@@ -319,6 +322,11 @@ func runRouter(cmd *cobra.Command, args []string) {
 	}
 	if whatsappVerifyToken == "" {
 		whatsappVerifyToken = os.Getenv("WHATSAPP_VERIFY_TOKEN")
+	}
+	if webappPort == 0 {
+		if port := os.Getenv("WEBAPP_PORT"); port != "" {
+			fmt.Sscanf(port, "%d", &webappPort)
+		}
 	}
 	if aiProvider == "" {
 		aiProvider = os.Getenv("AI_PROVIDER")
@@ -512,6 +520,9 @@ func runRouter(cmd *cobra.Command, args []string) {
 		}
 		if whatsappVerifyToken == "" {
 			whatsappVerifyToken = savedCfg.Platforms.WhatsApp.VerifyToken
+		}
+		if webappPort == 0 && savedCfg.Platforms.Webapp.Port != 0 {
+			webappPort = savedCfg.Platforms.Webapp.Port
 		}
 	}
 
@@ -888,6 +899,17 @@ func runRouter(cmd *cobra.Command, args []string) {
 		r.Register(whatsappPlatform)
 	} else {
 		logger.Info("WhatsApp tokens not provided, skipping WhatsApp integration")
+	}
+
+	// Register Web chat UI if port is configured
+	if webappPort > 0 {
+		webappPlatform, err := webapp.New(webapp.Config{Port: webappPort})
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error creating webapp platform: %v\n", err)
+			os.Exit(1)
+		}
+		r.Register(webappPlatform)
+		logger.Info("Web chat UI: http://localhost:%d", webappPort)
 	}
 
 	// Start the router

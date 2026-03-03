@@ -196,6 +196,7 @@ type PlatformConfig struct {
 	NOSTR      NOSTRConfig      `yaml:"nostr,omitempty"`
 	Zalo       ZaloConfig       `yaml:"zalo,omitempty"`
 	Nextcloud  NextcloudConfig  `yaml:"nextcloud,omitempty"`
+	Webapp     WebappConfig     `yaml:"webapp,omitempty"`
 }
 
 type WeComConfig struct {
@@ -301,6 +302,11 @@ type NextcloudConfig struct {
 	Username  string `yaml:"username,omitempty"`
 	Password  string `yaml:"password,omitempty"`
 	RoomToken string `yaml:"room_token,omitempty"`
+}
+
+type WebappConfig struct {
+	Port  int    `yaml:"port,omitempty"`
+	Token string `yaml:"token,omitempty"`
 }
 
 type SecurityConfig struct {

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lingti-bot</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f5; display: flex; height: 100vh; overflow: hidden; }
+
+  /* Sidebar */
+  #sidebar { width: 260px; background: #1c1c1e; display: flex; flex-direction: column; flex-shrink: 0; }
+  #sidebar-header { padding: 20px 16px 12px; color: #fff; font-size: 18px; font-weight: 600; letter-spacing: -0.3px; }
+  #new-chat-btn { margin: 0 12px 12px; padding: 10px; background: #2c2c2e; color: #fff; border: 1px solid #3a3a3c; border-radius: 10px; cursor: pointer; font-size: 14px; text-align: left; display: flex; align-items: center; gap: 8px; transition: background 0.15s; }
+  #new-chat-btn:hover { background: #3a3a3c; }
+  #sessions-list { flex: 1; overflow-y: auto; padding: 4px 0; }
+  #sessions-list::-webkit-scrollbar { width: 4px; }
+  #sessions-list::-webkit-scrollbar-thumb { background: #3a3a3c; border-radius: 2px; }
+  .session-item { display: flex; align-items: center; padding: 10px 16px; cursor: pointer; color: #e5e5e7; font-size: 14px; border-radius: 8px; margin: 2px 8px; gap: 8px; transition: background 0.1s; }
+  .session-item:hover { background: #2c2c2e; }
+  .session-item.active { background: #3a3a3c; }
+  .session-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .session-del { opacity: 0; color: #8e8e93; font-size: 16px; padding: 2px 4px; border-radius: 4px; transition: opacity 0.1s; flex-shrink: 0; }
+  .session-item:hover .session-del { opacity: 1; }
+  .session-del:hover { background: #48484a; color: #ff453a; }
+
+  /* Main panel */
+  #main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  #chat-header { background: #fff; border-bottom: 1px solid #e5e5e5; padding: 16px 20px; font-size: 16px; font-weight: 600; color: #1c1c1e; display: flex; align-items: center; gap: 10px; }
+  #chat-header .session-title { flex: 1; }
+  #clear-btn { padding: 6px 12px; background: none; border: 1px solid #e5e5e5; border-radius: 6px; color: #8e8e93; font-size: 13px; cursor: pointer; }
+  #clear-btn:hover { background: #f5f5f5; color: #1c1c1e; }
+
+  #messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+  #messages::-webkit-scrollbar { width: 6px; }
+  #messages::-webkit-scrollbar-thumb { background: #d1d1d6; border-radius: 3px; }
+
+  .msg { display: flex; flex-direction: column; max-width: 75%; }
+  .msg.user { align-self: flex-end; align-items: flex-end; }
+  .msg.bot { align-self: flex-start; align-items: flex-start; }
+  .bubble { padding: 10px 14px; border-radius: 18px; font-size: 15px; line-height: 1.5; word-break: break-word; }
+  .msg.user .bubble { background: #007aff; color: #fff; border-bottom-right-radius: 4px; }
+  .msg.bot .bubble { background: #fff; color: #1c1c1e; border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+
+  /* Markdown in bot bubbles */
+  .msg.bot .bubble p { margin: 0 0 8px; }
+  .msg.bot .bubble p:last-child { margin-bottom: 0; }
+  .msg.bot .bubble h1, .msg.bot .bubble h2, .msg.bot .bubble h3 { margin: 12px 0 6px; font-size: 15px; }
+  .msg.bot .bubble code { background: #f0f0f0; padding: 1px 5px; border-radius: 4px; font-family: Menlo, monospace; font-size: 13px; }
+  .msg.bot .bubble pre { background: #1e1e1e; color: #d4d4d4; padding: 12px; border-radius: 8px; overflow-x: auto; margin: 8px 0; }
+  .msg.bot .bubble pre code { background: none; padding: 0; color: inherit; }
+  .msg.bot .bubble ul, .msg.bot .bubble ol { padding-left: 20px; margin: 6px 0; }
+  .msg.bot .bubble blockquote { border-left: 3px solid #007aff; padding-left: 10px; color: #666; margin: 6px 0; }
+  .msg.bot .bubble table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 13px; }
+  .msg.bot .bubble th, .msg.bot .bubble td { border: 1px solid #e5e5e5; padding: 6px 10px; }
+  .msg.bot .bubble th { background: #f5f5f5; }
+
+  /* Spinner */
+  .spinner { display: flex; gap: 4px; padding: 12px 14px; }
+  .spinner span { width: 7px; height: 7px; background: #c7c7cc; border-radius: 50%; animation: bounce 1.2s infinite; }
+  .spinner span:nth-child(2) { animation-delay: 0.2s; }
+  .spinner span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+
+  /* Empty state */
+  #empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8e8e93; gap: 8px; }
+  #empty-state svg { opacity: 0.3; }
+  #empty-state p { font-size: 15px; }
+
+  /* No session selected */
+  #no-session { flex: 1; display: flex; align-items: center; justify-content: center; color: #8e8e93; font-size: 15px; }
+
+  /* Input bar */
+  #input-bar { background: #fff; border-top: 1px solid #e5e5e5; padding: 12px 16px; display: flex; gap: 10px; align-items: flex-end; }
+  #msg-input { flex: 1; border: 1px solid #e5e5e5; border-radius: 20px; padding: 10px 16px; font-size: 15px; resize: none; outline: none; max-height: 120px; line-height: 1.4; font-family: inherit; transition: border-color 0.15s; }
+  #msg-input:focus { border-color: #007aff; }
+  #send-btn { background: #007aff; color: #fff; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
+  #send-btn:hover { background: #0062cc; }
+  #send-btn:disabled { background: #c7c7cc; cursor: default; }
+  #send-btn svg { width: 16px; height: 16px; }
+
+  @media (max-width: 600px) {
+    #sidebar { width: 220px; }
+    .msg { max-width: 88%; }
+  }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div id="sidebar-header">lingti-bot</div>
+  <button id="new-chat-btn">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    New Chat
+  </button>
+  <div id="sessions-list"></div>
+</div>
+
+<div id="main">
+  <div id="no-session">Select a chat or start a new one</div>
+</div>
+
+<script>
+const WS_URL = `ws://${location.host}/ws`;
+const STORAGE_KEY = 'lingti_sessions';
+
+// State
+let sessions = loadSessions();
+let activeSessionID = null;
+let ws = null;
+let pendingSpinner = null; // {sessionID, el}
+
+// ─── Storage ───────────────────────────────────────────────────────────────
+
+function loadSessions() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; }
+}
+
+function saveSessions() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+}
+
+function getSession(id) {
+  return sessions.find(s => s.id === id);
+}
+
+function saveMessages(sessionID, msgs) {
+  localStorage.setItem(`lingti_msgs_${sessionID}`, JSON.stringify(msgs));
+}
+
+function loadMessages(sessionID) {
+  try { return JSON.parse(localStorage.getItem(`lingti_msgs_${sessionID}`)) || []; } catch { return []; }
+}
+
+function deleteSessionData(sessionID) {
+  localStorage.removeItem(`lingti_msgs_${sessionID}`);
+}
+
+// ─── WebSocket ─────────────────────────────────────────────────────────────
+
+function connectWS() {
+  if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
+  ws = new WebSocket(WS_URL);
+
+  ws.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    onServerMessage(msg);
+  };
+
+  ws.onclose = () => {
+    setTimeout(connectWS, 2000);
+  };
+
+  ws.onerror = () => {
+    ws.close();
+  };
+}
+
+function wsSend(obj) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(obj));
+  }
+}
+
+// ─── Server messages ────────────────────────────────────────────────────────
+
+function onServerMessage(msg) {
+  const { session_id, type, text, done } = msg;
+
+  // Remove spinner for this session
+  if (pendingSpinner && pendingSpinner.sessionID === session_id) {
+    pendingSpinner.el.remove();
+    pendingSpinner = null;
+  }
+
+  // Append bot message
+  const msgs = loadMessages(session_id);
+  msgs.push({ role: 'bot', text, ts: Date.now() });
+  saveMessages(session_id, msgs);
+
+  if (activeSessionID === session_id) {
+    appendMessage('bot', text);
+    scrollToBottom();
+  }
+
+  setInputDisabled(false);
+}
+
+// ─── UI ────────────────────────────────────────────────────────────────────
+
+function renderSidebar() {
+  const list = document.getElementById('sessions-list');
+  list.innerHTML = '';
+  [...sessions].reverse().forEach(s => {
+    const item = document.createElement('div');
+    item.className = 'session-item' + (s.id === activeSessionID ? ' active' : '');
+    item.innerHTML = `<span class="session-name">${escHtml(s.name || 'New Chat')}</span><span class="session-del" title="Delete">✕</span>`;
+    item.querySelector('.session-name').addEventListener('click', () => selectSession(s.id));
+    item.querySelector('.session-del').addEventListener('click', (e) => { e.stopPropagation(); deleteSession(s.id); });
+    list.appendChild(item);
+  });
+}
+
+function buildMain(session) {
+  const main = document.getElementById('main');
+  main.innerHTML = `
+    <div id="chat-header">
+      <span class="session-title">${escHtml(session.name || 'New Chat')}</span>
+      <button id="clear-btn">Clear history</button>
+    </div>
+    <div id="messages"></div>
+    <div id="input-bar">
+      <textarea id="msg-input" rows="1" placeholder="Message…"></textarea>
+      <button id="send-btn">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M2 8l12-6-5 6 5 6-12-6z" fill="currentColor"/></svg>
+      </button>
+    </div>
+  `;
+
+  document.getElementById('clear-btn').addEventListener('click', clearHistory);
+  document.getElementById('send-btn').addEventListener('click', sendMessage);
+  document.getElementById('msg-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+  document.getElementById('msg-input').addEventListener('input', autoResize);
+
+  // Restore messages
+  const msgs = loadMessages(session.id);
+  msgs.forEach(m => appendMessage(m.role, m.text));
+  scrollToBottom();
+}
+
+function appendMessage(role, text) {
+  const container = document.getElementById('messages');
+  if (!container) return;
+
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+
+  if (role === 'bot') {
+    bubble.innerHTML = marked.parse(text || '');
+  } else {
+    bubble.textContent = text;
+  }
+  div.appendChild(bubble);
+  container.appendChild(div);
+}
+
+function showSpinner(sessionID) {
+  const container = document.getElementById('messages');
+  if (!container) return;
+  const div = document.createElement('div');
+  div.className = 'msg bot';
+  div.innerHTML = '<div class="bubble"><div class="spinner"><span></span><span></span><span></span></div></div>';
+  container.appendChild(div);
+  pendingSpinner = { sessionID, el: div };
+  scrollToBottom();
+}
+
+function scrollToBottom() {
+  const m = document.getElementById('messages');
+  if (m) m.scrollTop = m.scrollHeight;
+}
+
+function autoResize() {
+  const ta = document.getElementById('msg-input');
+  if (!ta) return;
+  ta.style.height = 'auto';
+  ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+}
+
+function setInputDisabled(disabled) {
+  const btn = document.getElementById('send-btn');
+  const ta = document.getElementById('msg-input');
+  if (btn) btn.disabled = disabled;
+  if (ta) ta.disabled = disabled;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── Actions ───────────────────────────────────────────────────────────────
+
+function selectSession(id) {
+  activeSessionID = id;
+  renderSidebar();
+  const session = getSession(id);
+  if (session) buildMain(session);
+}
+
+function newSession() {
+  const id = crypto.randomUUID();
+  sessions.push({ id, name: 'New Chat', ts: Date.now() });
+  saveSessions();
+  selectSession(id);
+  renderSidebar();
+}
+
+function deleteSession(id) {
+  sessions = sessions.filter(s => s.id !== id);
+  deleteSessionData(id);
+  saveSessions();
+  if (activeSessionID === id) {
+    activeSessionID = null;
+    document.getElementById('main').innerHTML = '<div id="no-session">Select a chat or start a new one</div>';
+  }
+  renderSidebar();
+}
+
+function sendMessage() {
+  if (!activeSessionID) return;
+  const ta = document.getElementById('msg-input');
+  if (!ta) return;
+  const text = ta.value.trim();
+  if (!text) return;
+
+  // Append user message
+  const msgs = loadMessages(activeSessionID);
+  msgs.push({ role: 'user', text, ts: Date.now() });
+  saveMessages(activeSessionID, msgs);
+  appendMessage('user', text);
+
+  // Update session name on first message
+  const session = getSession(activeSessionID);
+  if (session && (session.name === 'New Chat' || !session.name)) {
+    session.name = text.slice(0, 30) + (text.length > 30 ? '…' : '');
+    saveSessions();
+    renderSidebar();
+    const title = document.querySelector('#chat-header .session-title');
+    if (title) title.textContent = session.name;
+  }
+
+  // Clear input
+  ta.value = '';
+  ta.style.height = 'auto';
+
+  // Show spinner and disable input
+  showSpinner(activeSessionID);
+  setInputDisabled(true);
+  scrollToBottom();
+
+  // Send over WebSocket
+  wsSend({ type: 'message', session_id: activeSessionID, text });
+}
+
+function clearHistory() {
+  if (!activeSessionID) return;
+  if (!confirm('Clear conversation history for this session?')) return;
+
+  // Clear local storage
+  saveMessages(activeSessionID, []);
+
+  // Clear UI
+  const container = document.getElementById('messages');
+  if (container) container.innerHTML = '';
+
+  // Notify server
+  wsSend({ type: 'clear', session_id: activeSessionID });
+}
+
+// ─── Init ──────────────────────────────────────────────────────────────────
+
+document.getElementById('new-chat-btn').addEventListener('click', newSession);
+
+renderSidebar();
+connectWS();
+
+// Auto-select last session
+if (sessions.length > 0) {
+  selectSession(sessions[sessions.length - 1].id);
+}
+</script>
+</body>
+</html>
