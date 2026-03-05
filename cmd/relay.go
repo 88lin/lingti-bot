@@ -24,6 +24,7 @@ import (
 var (
 	relayUserID        string
 	relayPlatform      string
+	relayHost          string
 	relayServerURL     string
 	relayWebhookURL    string
 	relayRefreshBotID  bool
@@ -108,6 +109,7 @@ func init() {
 
 	relayCmd.Flags().StringVar(&relayUserID, "user-id", "", "User ID from /whoami (required, or RELAY_USER_ID env)")
 	relayCmd.Flags().StringVar(&relayPlatform, "platform", "", "Platform: feishu, slack, wechat, or wecom (required, or RELAY_PLATFORM env)")
+	relayCmd.Flags().StringVar(&relayHost, "host", "", "Base URL of the relay server (e.g. http://localhost:8080 or https://bot.lingti.com); sets --server and --webhook")
 	relayCmd.Flags().StringVar(&relayServerURL, "server", "", "WebSocket URL (default: wss://bot.lingti.com/ws, or RELAY_SERVER_URL env)")
 	relayCmd.Flags().StringVar(&relayWebhookURL, "webhook", "", "Webhook URL (default: https://bot.lingti.com/webhook, or RELAY_WEBHOOK_URL env)")
 	relayCmd.Flags().StringVar(&relayAIProvider, "provider", "", "AI provider: claude, deepseek, kimi, qwen (or AI_PROVIDER env)")
@@ -144,6 +146,28 @@ func runRelay(cmd *cobra.Command, args []string) {
 	}
 	if relayWebhookURL == "" {
 		relayWebhookURL = os.Getenv("RELAY_WEBHOOK_URL")
+	}
+
+	// --host sets both server and webhook URLs (explicit --server/--webhook override it)
+	if relayHost != "" {
+		// Derive WebSocket scheme from HTTP scheme
+		wsBase := strings.TrimRight(relayHost, "/")
+		httpBase := wsBase
+		if strings.HasPrefix(wsBase, "https://") {
+			wsBase = "wss://" + wsBase[len("https://"):]
+		} else if strings.HasPrefix(wsBase, "http://") {
+			wsBase = "ws://" + wsBase[len("http://"):]
+		} else {
+			// bare host, assume secure
+			wsBase = "wss://" + wsBase
+			httpBase = "https://" + httpBase
+		}
+		if relayServerURL == "" {
+			relayServerURL = wsBase + "/ws"
+		}
+		if relayWebhookURL == "" {
+			relayWebhookURL = httpBase + "/webhook"
+		}
 	}
 	if relayAIProvider == "" {
 		relayAIProvider = os.Getenv("AI_PROVIDER")
@@ -279,7 +303,14 @@ func runRelay(cmd *cobra.Command, args []string) {
 			}
 		}
 		if relayRefreshBotID {
-			fmt.Printf("[Relay] Bot ID refreshed. New bot page: https://bot.lingti.com/bots/%s\n", savedCfg.BotID)
+			botBase := "https://bot.lingti.com"
+			if relayHost != "" {
+				botBase = strings.TrimRight(relayHost, "/")
+				if !strings.HasPrefix(botBase, "http") {
+					botBase = "https://" + botBase
+				}
+			}
+			fmt.Printf("[Relay] Bot ID refreshed. New bot page: %s/bots/%s\n", botBase, savedCfg.BotID)
 			return
 		}
 	}
@@ -453,7 +484,14 @@ func runRelay(cmd *cobra.Command, args []string) {
 	log.Printf("Relay connected. User: %s, Platform: %s", relayUserID, relayPlatform)
 	log.Printf("AI Provider: %s, Model: %s", providerName, modelName)
 	if relayBotID != "" {
-		fmt.Printf("[Relay] Your bot page: https://bot.lingti.com/bots/%s\n", relayBotID)
+		botBase := "https://bot.lingti.com"
+		if relayHost != "" {
+			botBase = strings.TrimRight(relayHost, "/")
+			if !strings.HasPrefix(botBase, "http") {
+				botBase = "https://" + botBase
+			}
+		}
+		fmt.Printf("[Relay] Your bot page: %s/bots/%s\n", botBase, relayBotID)
 	}
 	log.Println("Press Ctrl+C to stop.")
 
