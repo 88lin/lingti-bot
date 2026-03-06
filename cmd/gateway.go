@@ -631,6 +631,25 @@ func resolveRouterEnvVars() {
 
 // applyRouterConfigFallbacks fills remaining empty vars from the config file.
 func applyRouterConfigFallbacks(savedCfg *config.Config) {
+	// When agents are configured and no provider was explicitly set via CLI/env,
+	// prefer the default agent's AI config over relay.provider / ai.provider.
+	if aiProvider == "" && len(savedCfg.Agents) > 0 {
+		defaultID := savedCfg.DefaultAgentID()
+		if entry, ok := savedCfg.FindAgent(defaultID); ok {
+			ai := savedCfg.ResolveAgentAI(entry)
+			if ai.Provider != "" {
+				aiProvider = ai.Provider
+				aiAPIKey = ai.APIKey
+				aiBaseURL = ai.BaseURL
+				aiModel = ai.Model
+				if aiCallTimeout == 0 && savedCfg.AI.CallTimeoutSecs > 0 {
+					aiCallTimeout = savedCfg.AI.CallTimeoutSecs
+				}
+				return
+			}
+		}
+	}
+
 	resolved, found := savedCfg.ResolveProvider(aiProvider)
 	if found {
 		if aiProvider == "" {
