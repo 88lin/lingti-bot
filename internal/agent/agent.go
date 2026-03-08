@@ -120,9 +120,46 @@ var openaiCompatAliases = map[string]string{
 	"hungyuan":     "hunyuan",
 }
 
+// inferProviderFromModel guesses the provider from a model name when provider is unset.
+func inferProviderFromModel(model string) string {
+	m := strings.ToLower(model)
+	switch {
+	case strings.HasPrefix(m, "kimi-") || strings.HasPrefix(m, "moonshot-"):
+		return "kimi"
+	case strings.HasPrefix(m, "deepseek-"):
+		return "deepseek"
+	case strings.HasPrefix(m, "qwen-"):
+		return "qwen"
+	case strings.HasPrefix(m, "glm-"):
+		return "zhipu"
+	case strings.HasPrefix(m, "gpt-") || strings.HasPrefix(m, "o1") || strings.HasPrefix(m, "o3"):
+		return "openai"
+	case strings.HasPrefix(m, "gemini-"):
+		return "gemini"
+	case strings.HasPrefix(m, "claude-"):
+		return "claude"
+	case strings.HasPrefix(m, "grok-"):
+		return "grok"
+	case strings.HasPrefix(m, "doubao-"):
+		return "doubao"
+	case strings.HasPrefix(m, "step-"):
+		return "stepfun"
+	case strings.HasPrefix(m, "yi-"):
+		return "yi"
+	case strings.HasPrefix(m, "hunyuan-"):
+		return "hunyuan"
+	case strings.HasPrefix(m, "minimax-") || strings.HasPrefix(m, "minimax-text"):
+		return "minimax"
+	}
+	return ""
+}
+
 // createProvider creates the appropriate AI provider based on config
 func createProvider(cfg Config) (Provider, error) {
 	name := strings.ToLower(cfg.Provider)
+	if name == "" && cfg.Model != "" {
+		name = inferProviderFromModel(cfg.Model)
+	}
 
 	switch name {
 	case "deepseek":
