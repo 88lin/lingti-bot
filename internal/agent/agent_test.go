@@ -37,6 +37,38 @@ func TestCreateProvider_EmptyDefaultsClaude(t *testing.T) {
 	}
 }
 
+// TestCreateProvider_InferFromModel ensures that when provider is empty but a
+// model name is set, the correct provider is inferred and used. This guards
+// against the regression where e.g. model=kimi-k2.5 with no provider would
+// send requests to Anthropic instead of Kimi.
+func TestCreateProvider_InferFromModel(t *testing.T) {
+	cases := []struct {
+		model    string
+		wantName string
+	}{
+		{"kimi-k2.5", "kimi"},
+		{"moonshot-v1-8k", "kimi"},
+		{"deepseek-chat", "deepseek"},
+		{"deepseek-r1", "deepseek"},
+		{"qwen-plus", "qwen"},
+		{"glm-4-flash", "zhipu"},
+		{"gpt-4o", "openai"},
+		{"gemini-2.0-flash", "gemini"},
+		{"claude-sonnet-4-20250514", "claude"},
+		{"grok-2-latest", "grok"},
+	}
+	for _, tc := range cases {
+		p, err := createProvider(Config{Provider: "", APIKey: "test-key", Model: tc.model})
+		if err != nil {
+			t.Errorf("model=%q: createProvider failed: %v", tc.model, err)
+			continue
+		}
+		if p.Name() != tc.wantName {
+			t.Errorf("model=%q: expected provider %q, got %q", tc.model, tc.wantName, p.Name())
+		}
+	}
+}
+
 func TestCreateProvider_Unknown(t *testing.T) {
 	_, err := createProvider(Config{Provider: "nonexistent", APIKey: "test-key"})
 	if err == nil {

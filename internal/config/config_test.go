@@ -109,6 +109,37 @@ func TestResolveProvider_DifferentProviderNoMap(t *testing.T) {
 	}
 }
 
+// TestResolveAgentAI_APIKeyOnlyAgent ensures that an agent with only api_key set
+// (no provider) still returns the key so callers can use it without a provider.
+// This guards against the bug where gateway/relay required ai.Provider != "" before
+// reading the api_key, causing "AI API key is required" even when an agent was configured.
+func TestResolveAgentAI_APIKeyOnlyAgent(t *testing.T) {
+	cfg := &Config{
+		Agents: []AgentEntry{
+			{ID: "lingti", Default: true, APIKey: "sk-kimi-abc", Model: "kimi-k2.5"},
+		},
+	}
+	defaultID := cfg.DefaultAgentID()
+	if defaultID != "lingti" {
+		t.Fatalf("expected default agent 'lingti', got %q", defaultID)
+	}
+	entry, ok := cfg.FindAgent(defaultID)
+	if !ok {
+		t.Fatal("agent 'lingti' not found")
+	}
+	ai := cfg.ResolveAgentAI(entry)
+	if ai.APIKey != "sk-kimi-abc" {
+		t.Errorf("expected api_key 'sk-kimi-abc', got %q", ai.APIKey)
+	}
+	if ai.Model != "kimi-k2.5" {
+		t.Errorf("expected model 'kimi-k2.5', got %q", ai.Model)
+	}
+	// Provider should be empty (caller infers it from model name)
+	if ai.Provider != "" {
+		t.Errorf("expected empty provider, got %q", ai.Provider)
+	}
+}
+
 func TestApplyOverride_ProviderChange(t *testing.T) {
 	base := AIConfig{Provider: "claude", BaseURL: "https://api.anthropic.com", Model: "sonnet"}
 	result := applyOverride(base, AIOverride{Provider: "deepseek", APIKey: "dk"})

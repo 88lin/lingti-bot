@@ -637,11 +637,19 @@ func applyRouterConfigFallbacks(savedCfg *config.Config) {
 		defaultID := savedCfg.DefaultAgentID()
 		if entry, ok := savedCfg.FindAgent(defaultID); ok {
 			ai := savedCfg.ResolveAgentAI(entry)
-			if ai.Provider != "" {
-				aiProvider = ai.Provider
-				aiAPIKey = ai.APIKey
-				aiBaseURL = ai.BaseURL
-				aiModel = ai.Model
+			if ai.Provider != "" || ai.APIKey != "" {
+				if ai.Provider != "" {
+					aiProvider = ai.Provider
+				}
+				if aiAPIKey == "" {
+					aiAPIKey = ai.APIKey
+				}
+				if aiBaseURL == "" {
+					aiBaseURL = ai.BaseURL
+				}
+				if aiModel == "" {
+					aiModel = ai.Model
+				}
 				if aiCallTimeout == 0 && savedCfg.AI.CallTimeoutSecs > 0 {
 					aiCallTimeout = savedCfg.AI.CallTimeoutSecs
 				}
