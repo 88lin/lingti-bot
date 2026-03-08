@@ -998,7 +998,7 @@ func printOnboardSummary(cfg *config.Config) {
 		}
 	} else {
 		fmt.Println("  To start the bot, run:")
-		fmt.Println("    lingti-bot router")
+		fmt.Println("    lingti-bot gateway")
 	}
 	fmt.Println()
 	fmt.Println("  To reconfigure:")
