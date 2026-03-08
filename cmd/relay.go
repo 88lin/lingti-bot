@@ -243,8 +243,10 @@ func runRelay(cmd *cobra.Command, args []string) {
 			defaultID := savedCfg.DefaultAgentID()
 			if entry, ok := savedCfg.FindAgent(defaultID); ok {
 				ai := savedCfg.ResolveAgentAI(entry)
-				if ai.Provider != "" {
-					relayAIProvider = ai.Provider
+				if ai.Provider != "" || ai.APIKey != "" {
+					if ai.Provider != "" {
+						relayAIProvider = ai.Provider
+					}
 					if relayAPIKey == "" {
 						relayAPIKey = ai.APIKey
 					}

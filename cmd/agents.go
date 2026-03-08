@@ -68,31 +68,72 @@ var agentsAddCmd = &cobra.Command{
 			return fmt.Errorf("failed to load config: %w", err)
 		}
 
-		for _, a := range cfg.Agents {
+		// Find existing agent (if any) to use as defaults
+		existingIdx := -1
+		var existing config.AgentEntry
+		for i, a := range cfg.Agents {
 			if a.ID == id {
-				return fmt.Errorf("agent %q already exists", id)
+				existingIdx = i
+				existing = a
+				break
 			}
 		}
 
 		if interactive {
-			// progressively prompt for optional fields
+			// progressively prompt for optional fields, defaulting to existing values
 			providerOpts := []string{"(inherit from base config)"}
 			for _, p := range providers {
 				providerOpts = append(providerOpts, p.label)
 			}
-			idx := promptSelect("AI Provider:", providerOpts, 0)
+			defProviderIdx := 0
+			for i, p := range providers {
+				if p.name == existing.Provider {
+					defProviderIdx = i + 1
+					break
+				}
+			}
+			idx := promptSelect("AI Provider:", providerOpts, defProviderIdx)
 			if idx > 0 {
 				agentProvider = providers[idx-1].name
 			}
 
-			agentModel = promptText("Model (blank = inherit)", "")
-			agentAPIKey = promptText("API Key (blank = inherit)", "")
-			agentInstructions = promptText("Instructions (text or file path, optional)", "")
-			agentDefault = promptYesNo("Mark as default agent?", false)
+			agentModel = promptText("Model (blank = inherit)", existing.Model)
+			agentAPIKey = promptText("API Key (blank = inherit)", existing.APIKey)
+			agentInstructions = promptText("Instructions (text or file path, optional)", existing.Instructions)
+			agentDefault = promptYesNo("Mark as default agent?", existing.Default)
 
 			home, _ := os.UserHomeDir()
-			defaultWS := filepath.Join(home, ".lingti", "agents", id)
+			defaultWS := existing.Workspace
+			if defaultWS == "" {
+				defaultWS = filepath.Join(home, ".lingti", "agents", id)
+			}
 			agentWorkspace = promptText("Workspace directory", defaultWS)
+		} else if existingIdx >= 0 {
+			// Non-interactive update: only override fields that were explicitly passed
+			if !cmd.Flags().Changed("provider") {
+				agentProvider = existing.Provider
+			}
+			if !cmd.Flags().Changed("model") {
+				agentModel = existing.Model
+			}
+			if !cmd.Flags().Changed("api-key") {
+				agentAPIKey = existing.APIKey
+			}
+			if !cmd.Flags().Changed("instructions") {
+				agentInstructions = existing.Instructions
+			}
+			if !cmd.Flags().Changed("default") {
+				agentDefault = existing.Default
+			}
+			if !cmd.Flags().Changed("workspace") {
+				agentWorkspace = existing.Workspace
+			}
+			if agentAllowTools == "" && len(existing.AllowTools) > 0 {
+				agentAllowTools = strings.Join(existing.AllowTools, ",")
+			}
+			if agentDenyTools == "" && len(existing.DenyTools) > 0 {
+				agentDenyTools = strings.Join(existing.DenyTools, ",")
+			}
 		}
 
 		workspace := agentWorkspace
@@ -141,13 +182,19 @@ var agentsAddCmd = &cobra.Command{
 			}
 		}
 
-		cfg.Agents = append(cfg.Agents, entry)
+		action := "added"
+		if existingIdx >= 0 {
+			cfg.Agents[existingIdx] = entry
+			action = "updated"
+		} else {
+			cfg.Agents = append(cfg.Agents, entry)
+		}
 
 		if err := cfg.Save(); err != nil {
 			return fmt.Errorf("failed to save config: %w", err)
 		}
 
-		fmt.Printf("Agent %q added (workspace: %s)\n", id, workspace)
+		fmt.Printf("Agent %q %s (workspace: %s)\n", id, action, workspace)
 		return nil
 	},
 }
