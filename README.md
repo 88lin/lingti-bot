@@ -16,9 +16,9 @@
 
 **核心优势：**
 - 🚀 **零依赖部署** — 单个 30MB 二进制文件，无需 Node.js/Python 运行时，**一行命令**安装即用
-- ☁️ **[云中继](docs/cloud-relay.md)加持** — 无需公网服务器、域名备案、HTTPS 证书，5 分钟接入企业微信/微信公众号
-- 🤖 **[浏览器自动化](docs/browser-automation.md)** — 内置完整 CDP 控制引擎，可接管已有 Chrome 窗口，快照-操作模式精准定位元素，无需 Puppeteer/Playwright/Node.js
-- 🌐 **[社交平台自动化](docs/social-platform-automation.md)** — 通过 MCP + Chrome 浏览器能力，AI 代操作知乎、小红书等内容平台，自动发帖、评论、互动，解放运营双手
+- ☁️ **[云中继](https://bot.lingti.com/docs/cloud-relay)加持** — 无需公网服务器、域名备案、HTTPS 证书，5 分钟接入企业微信/微信公众号
+- 🤖 **[浏览器自动化](https://bot.lingti.com/docs/browser-automation)** — 内置完整 CDP 控制引擎，可接管已有 Chrome 窗口，快照-操作模式精准定位元素，无需 Puppeteer/Playwright/Node.js
+- 🌐 **[社交平台自动化](https://bot.lingti.com/docs/social-platform-automation)** — 通过 MCP + Chrome 浏览器能力，AI 代操作知乎、小红书等内容平台，自动发帖、评论、互动，解放运营双手
 - 🛠️ **75+ MCP 工具** — 覆盖文件、Shell、系统、网络、日历、Git、GitHub 等全场景
 - 🌏 **中国平台原生支持** — 钉钉、飞书、企业微信、微信公众号开箱即用
 - 💬 **[内置 Web 聊天界面](#web-chat-ui)** — 无需任何客户端，浏览器直开，支持**多会话并行**，每个会话独立记忆，刷新不丢失
@@ -28,13 +28,13 @@
 - 🐳 **Docker 部署** — 提供 Dockerfile 和 docker-compose.yml，一键容器化部署
 - 🩺 **健康诊断** — `lingti-bot doctor` 一键检查配置、连接、依赖，快速定位问题
 
-支持企业微信、飞书、钉钉、Slack、Telegram、Discord、WhatsApp、LINE、Teams 等 [19 种聊天平台](docs/chat-platforms.md) 接入，以及内置**浏览器 Web 聊天界面**（多会话并行），既可通过**云中继 5 分钟秒接**，也可 [OpenClaw](docs/openclaw-reference.md) 式**传统自建部署**。查看 [开发路线图](docs/roadmap.md) 了解更多功能规划。
+支持企业微信、飞书、钉钉、Slack、Telegram、Discord、WhatsApp、LINE、Teams 等 [19 种聊天平台](https://bot.lingti.com/docs/chat-platforms) 接入，以及内置**浏览器 Web 聊天界面**（多会话并行），既可通过**云中继 5 分钟秒接**，也可 [OpenClaw](https://bot.lingti.com/docs/openclaw-reference) 式**传统自建部署**。查看 [开发路线图](https://bot.lingti.com/docs/roadmap) 了解更多功能规划。
 
 > 🐕⚡ **为什么叫"灵小缇"？** 灵缇犬（Greyhound）是世界上跑得最快的犬，以敏捷、忠诚著称。灵小缇同样敏捷高效，是你忠实的 AI 助手。
 
 > **为什么不叫 lingtiClaw / lingclaw / ltclaw？**
 >
-> "Claw"的起源要追溯到 [OpenClaw](docs/openclaw-reference.md)。OpenClaw 的前身叫 **ClawdBot**，其名字从诞生之日起便有意蹭 **Claude**（目前最强编程智能体）的名气——"Clawd"与"Claude"发音高度相似。后来 Anthropic 向 ClawdBot 提起法律诉讼，团队被迫改名。为了保留"Clawd"的发音意向，他们在重重阻碍（甚至遭遇灰产抢注）之后，最终定下了 **OpenClaw** 这个名字。
+> "Claw"的起源要追溯到 [OpenClaw](https://bot.lingti.com/docs/openclaw-reference)。OpenClaw 的前身叫 **ClawdBot**，其名字从诞生之日起便有意蹭 **Claude**（目前最强编程智能体）的名气——"Clawd"与"Claude"发音高度相似。后来 Anthropic 向 ClawdBot 提起法律诉讼，团队被迫改名。为了保留"Clawd"的发音意向，他们在重重阻碍（甚至遭遇灰产抢注）之后，最终定下了 **OpenClaw** 这个名字。
 >
 > 所以，**"Claw"这个词，其实根植于"Claude"**。追根溯源，每一个带"Claw"（龙虾）的名字，都在向 Claude 致敬。这当然无可厚非——只是灵小缇想保留自己最朴素的定义：它就是一个 **Bot**。
 
@@ -99,7 +99,7 @@ lingti-bot relay --platform feishu \
   --provider claude --api-key sk-ant-xxx
 ```
 
-详见 [云中继文档](docs/cloud-relay.md)。
+详见 [云中继文档](https://bot.lingti.com/docs/cloud-relay)。
 
 ### 安装方式
 
@@ -238,7 +238,7 @@ lingti-bot relay --platform wechat   # 微信公众号
 | **中国平台** | 原生支持飞书/企微/钉钉 | 需自行集成 |
 | **云中继** | ✅ 免自建服务器，秒级接入微信/企微 | ❌ 需自建 Web 服务 |
 
-> 详细功能对比请参考：[OpenClaw vs lingti-bot 技术特性对比](docs/openclaw-feature-comparison.md)
+> 详细功能对比请参考：[OpenClaw vs lingti-bot 技术特性对比](https://bot.lingti.com/docs/openclaw-feature-comparison)
 
 **为什么选择纯 Go + 纯文本输出？**
 
@@ -332,9 +332,9 @@ make build
 | **Nextcloud Talk** | HTTP Polling | 自建 | 🔜 计划中 | ✅ |
 | **Web 聊天界面** | WebSocket | `--webapp-port` | — | ✅ |
 
-> 文件发送详情（配置方法、支持的文件类型、限制）：[文件发送指南](docs/file-sending.md)
+> 文件发送详情（配置方法、支持的文件类型、限制）：[文件发送指南](https://bot.lingti.com/docs/file-sending)
 
-> 完整列表（含配置参数、环境变量）：[聊天平台列表](docs/chat-platforms.md)
+> 完整列表（含配置参数、环境变量）：[聊天平台列表](https://bot.lingti.com/docs/chat-platforms)
 
 **云中继优势：** 无需公网服务器、无需域名备案、无需 HTTPS 证书、无需防火墙配置，5 分钟完成接入。
 
@@ -360,7 +360,7 @@ make build
 | **音乐控制** | 7 | 播放、暂停、切歌、音量、搜索 (macOS) |
 | **Git** | 4 | 状态、日志、差异、分支 |
 | **GitHub** | 6 | PR 列表/详情、Issue 管理、仓库信息 |
-| **[浏览器自动化](docs/browser-automation.md)** | 14 | CDP 控制引擎，可接管已有 Chrome，快照定位、点击/输入/JS、多标签页、截图 |
+| **[浏览器自动化](https://bot.lingti.com/docs/browser-automation)** | 14 | CDP 控制引擎，可接管已有 Chrome，快照定位、点击/输入/JS、多标签页、截图 |
 | **定时任务** | 5 | 创建、列表、删除、暂停、恢复计划任务 |
 
 ### 定时任务 — 自动化你的工作流
@@ -389,7 +389,7 @@ make build
 "每小时提醒我喝水"
 ```
 
-> 详细文档（完整示例、Cron 表达式、管理命令）：[定时任务指南](docs/cron-jobs.md)
+> 详细文档（完整示例、Cron 表达式、管理命令）：[定时任务指南](https://bot.lingti.com/docs/cron-jobs)
 
 ### 智能对话 — 多轮记忆，自然交流
 
@@ -503,14 +503,14 @@ lingti-bot skills info github
 
 内置 8 个 Skills：Discord、GitHub、Slack、Peekaboo（macOS UI 自动化）、Tmux、天气、1Password、Obsidian。支持用户自定义和项目级 Skills。
 
-详细文档：[Skills 指南](docs/skills.md)
+详细文档：[Skills 指南](https://bot.lingti.com/docs/skills)
 
 ### 功能速览表
 
 | 模块 | 说明 | 特点 |
 |------|------|------|
 | **MCP Server** | 标准 MCP 协议服务器 | 兼容 Claude Desktop、Cursor、Windsurf 等所有 MCP 客户端 |
-| **多平台消息网关** | [19 种聊天平台](docs/chat-platforms.md) | 微信公众号、企业微信、Slack、飞书一键接入，支持云中继 |
+| **多平台消息网关** | [19 种聊天平台](https://bot.lingti.com/docs/chat-platforms) | 微信公众号、企业微信、Slack、飞书一键接入，支持云中继 |
 | **[Web 聊天界面](#web-chat-ui)** | 内置浏览器 UI | 多会话并行，独立记忆隔离，Markdown 渲染，`--webapp-port` 一键启用 |
 | **MCP 工具集** | 75+ 本地系统工具 | 文件、Shell、系统、网络、日历、Git、GitHub 等全覆盖 |
 | **Skills** | 模块化能力扩展 | 8 个内置 Skill，支持自定义和项目级扩展 |
@@ -562,17 +562,17 @@ lingti-bot relay --platform wecom \
 | AI处理位置 | 服务器 | **本地** |
 | 数据安全 | 云端存储 | **本地处理** |
 
-> 📖 **深入了解云中继的架构原理、协议规范和完整消息流程，请阅读 [云中继技术方案详解](docs/cloud-relay.md)**
+> 📖 **深入了解云中继的架构原理、协议规范和完整消息流程，请阅读 [云中继技术方案详解](https://bot.lingti.com/docs/cloud-relay)**
 >
-> 详细对比请参考：[lingti-bot vs OpenClaw：简化 AI 集成的努力](docs/vs-openclaw-integration.md)
+> 详细对比请参考：[lingti-bot vs OpenClaw：简化 AI 集成的努力](https://bot.lingti.com/docs/vs-openclaw-integration)
 
 ### 微信公众号一键接入
 
 微信搜索公众号「**灵缇小秘**」，关注后发送任意消息获取接入教程，10秒将lingti-bot接入微信。
-详细教程请参考：[微信公众号接入指南](docs/wechat-integration.md)
+详细教程请参考：[微信公众号接入指南](https://bot.lingti.com/docs/wechat-integration)
 ### 飞书接入
 
-- 飞书商店应用正在上架流程中，目前可通过自建应用实现绑定。教程请参考：[飞书集成指南](https://github.com/ruilisi/lingti-bot/blob/master/docs/feishu-integration.md)
+- 飞书商店应用正在上架流程中，目前可通过自建应用实现绑定。教程请参考：[飞书集成指南](https://bot.lingti.com/docs/feishu-integration)
 
 ### 企业微信接入
 
@@ -596,7 +596,7 @@ lingti-bot relay --platform wecom \
 #    保存配置后验证自动完成，消息立即可以处理
 ```
 
-详细教程请参考：[企业微信集成指南](docs/wecom-integration.md) | [云中继技术方案详解](docs/cloud-relay.md)
+详细教程请参考：[企业微信集成指南](https://bot.lingti.com/docs/wecom-integration) | [云中继技术方案详解](https://bot.lingti.com/docs/cloud-relay)
 
 ### 钉钉接入
 
@@ -769,7 +769,7 @@ lingti-bot gateway \
 | **Nextcloud Talk** | HTTP Polling | ✅ 已支持 |
 | **Web 聊天界面** | WebSocket (内置) | ✅ 已支持 |
 
-> 完整列表：[聊天平台列表](docs/chat-platforms.md)
+> 完整列表：[聊天平台列表](https://bot.lingti.com/docs/chat-platforms)
 
 ### 一键接入
 
@@ -828,24 +828,24 @@ lingti-bot relay --provider openai --api-key "sk-xxx" --model "gpt-4o-mini"
 
 - [配置优先级](CONFIGURATION.md) - 命令行参数 > 环境变量 > 配置文件的解析机制
 - [AI 服务列表](AI-PROVIDERS.md) - 16 种 AI 服务详情、API Key 获取、别名
-- [聊天平台列表](docs/chat-platforms.md) - 19 种聊天平台详情、配置参数、环境变量
-- [命令行参考](docs/cli-reference.md) - 完整的命令行使用文档
-- [Skills 指南](docs/skills.md) - Skills 系统详解：创建、发现、配置
-- [Slack 集成指南](docs/slack-integration.md) - 完整的 Slack 应用配置教程
-- [飞书集成指南](docs/feishu-integration.md) - 飞书/Lark 应用配置教程
-- [企业微信集成指南](docs/wecom-integration.md) - 企业微信应用配置教程
-- [文件发送指南](docs/file-sending.md) - 各平台文件传输能力、配置与限制
-- [定时任务指南](docs/cron-jobs.md) - AI 智能任务 vs 静态消息、Cron 表达式、管理命令
-- [浏览器自动化指南](docs/browser-automation.md) - CDP 引擎、接管已有 Chrome、14 个工具完整参考、典型场景与故障排除
-- [浏览器 AI 操作规则](docs/browser-agent-rules.md) - AI agent 的所有浏览器行为规则：快照法则、搜索行为、弹窗处理、批量操作、连接模式、常见错误纠正
-- [社交平台自动化指南](docs/social-platform-automation.md) - 知乎、小红书等内容平台的 AI 自动化运营
-- [OpenClaw 技术特性对比](docs/openclaw-feature-comparison.md) - 详细功能差异分析
+- [聊天平台列表](https://bot.lingti.com/docs/chat-platforms) - 19 种聊天平台详情、配置参数、环境变量
+- [命令行参考](https://bot.lingti.com/docs/cli-reference) - 完整的命令行使用文档
+- [Skills 指南](https://bot.lingti.com/docs/skills) - Skills 系统详解：创建、发现、配置
+- [Slack 集成指南](https://bot.lingti.com/docs/slack-integration) - 完整的 Slack 应用配置教程
+- [飞书集成指南](https://bot.lingti.com/docs/feishu-integration) - 飞书/Lark 应用配置教程
+- [企业微信集成指南](https://bot.lingti.com/docs/wecom-integration) - 企业微信应用配置教程
+- [文件发送指南](https://bot.lingti.com/docs/file-sending) - 各平台文件传输能力、配置与限制
+- [定时任务指南](https://bot.lingti.com/docs/cron-jobs) - AI 智能任务 vs 静态消息、Cron 表达式、管理命令
+- [浏览器自动化指南](https://bot.lingti.com/docs/browser-automation) - CDP 引擎、接管已有 Chrome、14 个工具完整参考、典型场景与故障排除
+- [浏览器 AI 操作规则](https://bot.lingti.com/docs/browser-agent-rules) - AI agent 的所有浏览器行为规则：快照法则、搜索行为、弹窗处理、批量操作、连接模式、常见错误纠正
+- [社交平台自动化指南](https://bot.lingti.com/docs/social-platform-automation) - 知乎、小红书等内容平台的 AI 自动化运营
+- [OpenClaw 技术特性对比](https://bot.lingti.com/docs/openclaw-feature-comparison) - 详细功能差异分析
 
 ---
 
 ## MCP 工具集
 
-灵小缇提供 **75+ MCP 工具**，覆盖日常工作的方方面面。包含全新的[浏览器自动化](docs/browser-automation.md)能力。
+灵小缇提供 **75+ MCP 工具**，覆盖日常工作的方方面面。包含全新的[浏览器自动化](https://bot.lingti.com/docs/browser-automation)能力。
 
 ### 工具分类
 
@@ -867,7 +867,7 @@ lingti-bot relay --provider openai --api-key "sk-xxx" --model "gpt-4o-mini"
 | 音乐控制 (macOS) | 7 | 播放、暂停、切歌、音量 |
 | Git | 4 | 状态、日志、差异、分支 |
 | GitHub | 6 | PR、Issue、仓库信息 |
-| [浏览器自动化](docs/browser-automation.md) | 14 | 快照、点击、输入、JS 执行、批量操作、截图、标签页 |
+| [浏览器自动化](https://bot.lingti.com/docs/browser-automation) | 14 | 快照、点击、输入、JS 执行、批量操作、截图、标签页 |
 
 ### 文件操作
 
@@ -1017,7 +1017,7 @@ lingti-bot relay --provider openai --api-key "sk-xxx" --model "gpt-4o-mini"
 
 基于 [go-rod](https://github.com/go-rod/rod) 的纯 Go 浏览器自动化引擎，采用**快照-操作（Snapshot-then-Act）**模式，可接管已有 Chrome 窗口，无需 Puppeteer/Playwright/Node.js。
 
-> 📖 完整指南：[浏览器自动化文档](docs/browser-automation.md)
+> 📖 完整指南：[浏览器自动化文档](https://bot.lingti.com/docs/browser-automation)
 
 **连接已有 Chrome（推荐）：**
 
@@ -1312,8 +1312,8 @@ AI：  ✅ 已保存到 config.yaml (247 字节)
 - 即使启用 `--yes`，危险操作（如 `rm -rf /`）仍会被拒绝
 
 详细文档：
-- [自动批准完整指南](docs/auto-approval.md)
-- [快速参考](docs/auto-approval-quickref.md)
+- [自动批准完整指南](https://bot.lingti.com/docs/auto-approval)
+- [快速参考](https://bot.lingti.com/docs/auto-approval-quickref)
 
 #### 调试模式 (`--debug`)
 
@@ -1324,8 +1324,8 @@ lingti-bot --debug router --provider deepseek --api-key sk-xxx
 ```
 
 详细文档：
-- [浏览器调试指南](docs/browser-debug.md)
-- [快速参考](docs/browser-debug-quickref.md)
+- [浏览器调试指南](https://bot.lingti.com/docs/browser-debug)
+- [快速参考](https://bot.lingti.com/docs/browser-debug-quickref)
 
 ---
 
