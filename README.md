@@ -62,6 +62,18 @@ Your bot page: https://bot.lingti.com/bots/xxx
 
 > 支持的 `--provider`：`deepseek`、`claude`、`kimi`、`minimax`、`gemini`、`openai` 等，详见 [AI-PROVIDERS.md](AI-PROVIDERS.md)。
 
+### 桌面客户端（可选）
+
+图形界面，开机自启，一键管理：
+
+| 平台 | 架构 | 下载 |
+|------|------|------|
+| Windows | x64 | [bot.lingti.com/download](https://bot.lingti.com/download) |
+| macOS | Apple Silicon (M 系列) | [bot.lingti.com/download](https://bot.lingti.com/download) |
+| macOS | Intel | [bot.lingti.com/download](https://bot.lingti.com/download) |
+
+> 命令行版本（`lingti-bot`）通过上方的安装脚本获取，桌面客户端为独立 GUI 程序。
+
 ---
 
 ### 进阶：接入消息平台（企业微信、飞书等）
@@ -1101,7 +1113,8 @@ make build  # 或: make darwin-arm64 / make linux-amd64
 
 **手动下载**
 
-前往 [GitHub Releases](https://github.com/ruilisi/lingti-bot/releases) 下载对应平台的二进制文件。
+- **命令行版本**：前往 [GitHub Releases](https://github.com/ruilisi/lingti-bot/releases) 下载对应平台的二进制文件
+- **桌面客户端**（Windows x64 / macOS Apple Silicon / macOS Intel）：前往 [bot.lingti.com/download](https://bot.lingti.com/download) 下载
 
 ### 使用方式
 
