@@ -198,19 +198,11 @@ func New(cfg Config) (*Platform, error) {
 		e2eSessions: make(map[string][]byte),
 	}
 
-	// Load or generate E2E key pair when BotID is set (bot page mode)
-	if cfg.BotID != "" {
-		keyFile := cfg.E2EKeyFile
-		if keyFile == "" {
-			homeDir, err := os.UserHomeDir()
-			if err != nil {
-				homeDir = os.TempDir()
-			}
-			keyFile = filepath.Join(homeDir, ".lingti-e2e.pem")
-		}
-		priv, err := e2e.GenerateOrLoadKeyPair(keyFile)
+	// Load E2E key pair when a key file is configured
+	if cfg.E2EKeyFile != "" {
+		priv, err := e2e.LoadKeyPair(cfg.E2EKeyFile)
 		if err != nil {
-			log.Printf("[Relay] Warning: E2E key setup failed: %v", err)
+			log.Printf("[Relay] Warning: E2E key load failed: %v", err)
 		} else {
 			p.e2ePrivKey = priv
 			log.Printf("[Relay] E2E fingerprint: %s", e2e.Fingerprint(priv.PublicKey()))

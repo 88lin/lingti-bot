@@ -22,7 +22,8 @@ type Config struct {
 	Browser   BrowserConfig             `yaml:"browser,omitempty"`
 	Agents    []AgentEntry              `yaml:"agents,omitempty"`
 	Bindings  []AgentBinding            `yaml:"bindings,omitempty"`
-	BotID     string                    `yaml:"bot_id,omitempty"`
+	BotID      string                    `yaml:"bot_id,omitempty"`
+	E2EKeyFile string                    `yaml:"e2e_key_file,omitempty"` // path to PEM key file
 }
 
 // ProviderEntry defines a named AI provider configuration.

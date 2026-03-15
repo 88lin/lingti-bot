@@ -62,6 +62,35 @@ func GenerateOrLoadKeyPair(path string) (*ecdh.PrivateKey, error) {
 	return priv, nil
 }
 
+// LoadKeyPair loads a P-256 private key from path. Returns an error if the file
+// does not exist or cannot be parsed (unlike GenerateOrLoadKeyPair, it never generates).
+func LoadKeyPair(path string) (*ecdh.PrivateKey, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("e2e: cannot read key from %s: %w", path, err)
+	}
+	block, _ := pem.Decode(data)
+	if block == nil {
+		return nil, fmt.Errorf("e2e: invalid PEM in %s", path)
+	}
+	parsed, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	if err != nil {
+		return nil, fmt.Errorf("e2e: failed to parse key from %s: %w", path, err)
+	}
+	switch k := parsed.(type) {
+	case *ecdh.PrivateKey:
+		return k, nil
+	case *ecdsa.PrivateKey:
+		priv, err := k.ECDH()
+		if err != nil {
+			return nil, fmt.Errorf("e2e: ECDSA→ECDH conversion failed: %w", err)
+		}
+		return priv, nil
+	default:
+		return nil, fmt.Errorf("e2e: key in %s is not an EC key", path)
+	}
+}
+
 // PublicKeyToBase64 encodes an ECDH public key as base64 (uncompressed point).
 func PublicKeyToBase64(pub *ecdh.PublicKey) string {
 	return base64.StdEncoding.EncodeToString(pub.Bytes())

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"log"
@@ -11,11 +12,12 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/pltanton/lingti-bot/internal/agent"
 	"github.com/google/uuid"
+	"github.com/pltanton/lingti-bot/internal/agent"
 	"github.com/pltanton/lingti-bot/internal/agent/mcpclient"
 	"github.com/pltanton/lingti-bot/internal/config"
 	cronpkg "github.com/pltanton/lingti-bot/internal/cron"
+	"github.com/pltanton/lingti-bot/internal/e2e"
 	"github.com/pltanton/lingti-bot/internal/platforms/relay"
 	"github.com/pltanton/lingti-bot/internal/router"
 	"github.com/spf13/cobra"
@@ -339,6 +341,54 @@ func runRelay(cmd *cobra.Command, args []string) {
 			}
 			fmt.Printf("[Relay] Bot ID refreshed. New bot page: %s/bots/%s\n", botBase, savedCfg.BotID)
 			return
+		}
+	}
+
+	// Resolve E2E key file: CLI flag → env → saved config → default path
+	// Only needed when BotID is set (bot page mode)
+	if cfgErr == nil && savedCfg.BotID != "" {
+		if relayE2EKeyFile == "" {
+			relayE2EKeyFile = os.Getenv("E2E_KEY_FILE")
+		}
+		if relayE2EKeyFile == "" && savedCfg.E2EKeyFile != "" {
+			relayE2EKeyFile = savedCfg.E2EKeyFile
+		}
+		defaultKeyFile := filepath.Join(func() string {
+			h, err := os.UserHomeDir()
+			if err != nil {
+				return os.TempDir()
+			}
+			return h
+		}(), ".lingti-e2e.pem")
+		if relayE2EKeyFile == "" {
+			relayE2EKeyFile = defaultKeyFile
+		}
+		// Check if the resolved key file exists
+		if _, err := os.Stat(relayE2EKeyFile); os.IsNotExist(err) {
+			// Prompt user to generate a key
+			fmt.Printf("\nNo E2E key found at %s\n", relayE2EKeyFile)
+			fmt.Println("lingti-bot can generate one for you (stored locally, never sent to the server).")
+			fmt.Print("Generate now? [Y/n]: ")
+			scanner := bufio.NewScanner(os.Stdin)
+			scanner.Scan()
+			answer := strings.TrimSpace(scanner.Text())
+			if answer == "" || strings.ToLower(answer) == "y" {
+				priv, err := e2e.GenerateOrLoadKeyPair(relayE2EKeyFile)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error generating E2E key: %v\n", err)
+					os.Exit(1)
+				}
+				fmt.Printf("E2E key generated: %s\n", relayE2EKeyFile)
+				fmt.Printf("E2E fingerprint:   %s\n\n", e2e.Fingerprint(priv.PublicKey()))
+				// Save key file path to config
+				savedCfg.E2EKeyFile = relayE2EKeyFile
+				if err := savedCfg.Save(); err != nil {
+					fmt.Fprintf(os.Stderr, "Warning: failed to save key file path to config: %v\n", err)
+				}
+			} else {
+				// User declined — don't use E2EE
+				relayE2EKeyFile = ""
+			}
 		}
 	}
 
