@@ -370,11 +370,22 @@ func runRelay(cmd *cobra.Command, args []string) {
 				relayE2EKeyFile = ""
 			} else {
 				log.Printf("[E2E] Key generated: %s", relayE2EKeyFile)
+				log.Printf("[E2E] Public key:    %s", e2e.PublicKeyToBase64(priv.PublicKey()))
 				log.Printf("[E2E] Fingerprint:   %s", e2e.Fingerprint(priv.PublicKey()))
 				savedCfg.E2EKeyFile = relayE2EKeyFile
 				if err := savedCfg.Save(); err != nil {
 					fmt.Fprintf(os.Stderr, "Warning: failed to save E2E key path to config: %v\n", err)
 				}
+			}
+		} else {
+			priv, err := e2e.LoadKeyPair(relayE2EKeyFile)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Warning: failed to load E2E key: %v (continuing without E2EE)\n", err)
+				relayE2EKeyFile = ""
+			} else {
+				log.Printf("[E2E] Key file:      %s", relayE2EKeyFile)
+				log.Printf("[E2E] Public key:    %s", e2e.PublicKeyToBase64(priv.PublicKey()))
+				log.Printf("[E2E] Fingerprint:   %s", e2e.Fingerprint(priv.PublicKey()))
 			}
 		}
 	} else if relayNoE2E {
